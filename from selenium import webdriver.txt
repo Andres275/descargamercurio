@@ -1,0 +1,47 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+import time
+import os
+import pandas as pd
+
+
+# Configurar el navegador Chrome (asegúrate de tener instalado ChromeDriver: https://sites.google.com/a/chromium.org/chromedriver/)
+chrome_options = webdriver.ChromeOptions()
+  # Ejecutar en modo headless (sin ventana)
+driver = webdriver.Chrome(options=chrome_options)
+
+# URL de la página web
+url = 'https://caribesol.servisoft.com.co/mercurio/servlet/ControllerMercurio?command=consultaEspecial&tipoOperacion=parametros&idCnslta=00000014'
+
+# Cargar la página web
+driver.get(url)
+
+# Esperar a que aparezcan los campos de fecha
+fecha_inicio_field = WebDriverWait(driver, 5).until(
+    EC.presence_of_element_located((By.NAME, 'param0'))
+)
+fecha_fin_field = WebDriverWait(driver, 5).until(
+    EC.presence_of_element_located((By.NAME, 'param1'))
+)
+
+# Ingresar las fechas
+fecha_inicio_field.clear()  # Limpiar el campo de texto
+fecha_inicio_field.send_keys('01/05/2024')
+fecha_fin_field.clear()  # Limpiar el campo de texto
+fecha_fin_field.send_keys('19/05/2024')
+
+# Encontrar y hacer clic en el botón de generar
+generar_button = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.XPATH, '//input[@id="cmd_ejecuta_excel"]'))
+)
+generar_button.click()
+
+# Esperar a que se carguen los resultados (ajusta el tiempo según sea necesario)
+time.sleep(20)
+
+# Cerrar el navegador
+driver.quit()
+
